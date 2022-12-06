@@ -1,11 +1,11 @@
 <template>
-        <!-- Women Banner Section Begin -->
-        <section class="women-banner spad">
+    <!-- Women Banner Section Begin -->
+    <section class="women-banner spad">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-12 mt-5">
                     <Carousel class="product-slider" :items-to-show="3" :wrap-around="true">
-                        <Slide v-for="product in products" :key="product">
+                        <Slide v-for="product in products" :key="product.id">
                             <ProductItem :product="product" />
                         </Slide>
                         <template #addons>
@@ -23,8 +23,9 @@
 import 'vue3-carousel/dist/carousel.css'
 import { Carousel, Slide, Navigation } from 'vue3-carousel'
 import ProductItem from '@/components/homepage/ProductItem.vue'
+import axios from 'axios'
 
-export default{
+export default {
     name: "ProductSlider",
     components: {
         Carousel,
@@ -33,36 +34,21 @@ export default{
         ProductItem
     },
     data: () => ({
-        products: [
-            {
-                image: 'mickey1.jpg',
-                category_name: 'Coat',
-                name: 'Mickey Baggy',
-                price: 35,
-                discount_price: 14
-            },
-            {
-                image: 'products/women-2.jpg',
-                category_name: 'Shoes',
-                name: 'Guanzhou Sweater',
-                price: 49,
-                discount_price: 25
-            },
-            {
-                image: 'products/women-3.jpg',
-                category_name: 'Shoes',
-                name: 'Guanzhou Sweater',
-                price: 49,
-                discount_price: 25
-            },
-            {
-                image: 'products/women-4.jpg',
-                category_name: 'Shoes',
-                name: 'Guanzhou Sweater',
-                price: 49,
-                discount_price: 25
+        products: []
+    }),
+    methods: {
+        async getProductData(){
+            try {
+                const response = await axios.get('http://shayna-backend.belajarkoding.com/api/products');
+                this.products = response.data.data.data
+                // console.log(response.data.data.data)
+            } catch (error) {
+                console.error(error);
             }
-        ]
-    })
+        }
+    },
+    mounted() {
+        this.getProductData();
+    }
 }
 </script>

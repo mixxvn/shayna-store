@@ -22,14 +22,14 @@
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="product-pic-zoom">
-                                <img class="product-big-img" :src="require(`@/assets/img/${mainImage}`)" alt="" />
+                                <img class="product-big-img" :src="mainImage" alt="" />
                             </div>
                             <div class="product-thumbs">
-                                <Carousel class="product-thumbs-track ps-slider" :items-to-show="3"  :autoplay="1000" :transition="1000">
-                                        <Slide v-for="(image, index) in images" :key="index">
+                                <Carousel class="product-thumbs-track ps-slider" :items-to-show="3" :autoplay="1">
+                                        <Slide v-for="image in galleries" :key="image.id">
                                             <!-- <ProductThumbs :image="image" /> -->
-                                            <div @click="changeMainImage(image)" class="pt" :class="{ active: mainImage == image }" >
-                                            <img :src="require(`@/assets/img/${image}`)" alt=""
+                                            <div @click="changeMainImage(image.photo)" class="pt" :class="{ active: mainImage == image.photo }" >
+                                            <img :src="image.photo" alt=""
                                                 style="width: 178.333px;" />
                                         </div>
                                         </Slide>
@@ -39,30 +39,12 @@
                         <div class="col-lg-6">
                             <div class="product-details">
                                 <div class="pd-title">
-                                    <span>oranges</span>
-                                    <h3>Pure Pineapple</h3>
+                                    <span>{{ item.type }}</span>
+                                    <h3>{{ item.name }}</h3>
                                 </div>
                                 <div class="pd-desc">
-                                    <p>
-                                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Corporis, error
-                                        officia. Rem aperiam laborum voluptatum vel, pariatur modi hic provident eum
-                                        iure natus quos non a sequi, id accusantium! Autem.
-                                    </p>
-                                    <p>
-                                        Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quam possimus quisquam
-                                        animi, commodi, nihil voluptate nostrum neque architecto illo officiis
-                                        doloremque et corrupti cupiditate voluptatibus error illum. Commodi expedita
-                                        animi nulla aspernatur.
-                                        Id asperiores blanditiis, omnis repudiandae iste inventore cum, quam sint
-                                        molestiae accusamus voluptates ex tempora illum sit perspiciatis. Nostrum dolor
-                                        tenetur amet, illo natus magni veniam quia sit nihil dolores.
-                                        Commodi ratione distinctio harum voluptatum velit facilis voluptas animi non
-                                        laudantium, id dolorem atque perferendis enim ducimus? A exercitationem
-                                        recusandae aliquam quod. Itaque inventore obcaecati, unde quam
-                                        impedit praesentium veritatis quis beatae ea atque perferendis voluptates velit
-                                        architecto?
-                                    </p>
-                                    <h4>$495.00</h4>
+                                    <div  v-html="item.description"></div>
+                                    <h4>$ {{ item.price }}</h4>
                                 </div>
                                 <div class="quantity">
                                     <a href="shopping-cart.html" class="primary-btn pd-cart">Add To Cart</a>
@@ -122,6 +104,7 @@ import NavigationBar from '@/components/layouts/NavigationBar.vue'
 import 'vue3-carousel/dist/carousel.css'
 import { Carousel, Slide } from 'vue3-carousel'
 import FooterShayna from '@/components/layouts/FooterShayna.vue'
+import axios from 'axios'
 
 export default {
     name: "ProductView",
@@ -133,13 +116,7 @@ export default {
     },
     data() {
         return {
-            images: [
-                'mickey1.jpg',
-                'mickey2.jpg',
-                'mickey3.jpg',
-                'mickey4.jpg'
-            ],
-            mainImage: ['mickey1.jpg'],
+            mainImage: [],
             products: [
             {
                 image: 'products/women-1.jpg',
@@ -169,24 +146,39 @@ export default {
                 price: 49,
                 discount_price: 25
             }
-        ]
+            ],
+            item : [],
+            galleries: []
         }
     },
     methods: {
         changeMainImage(image){
             this.mainImage = image
+        },
+        async getProductData() {
+            const response = await axios.get('http://shayna-backend.belajarkoding.com/api/products?id=' + this.$route.params.id);
+            // console.log(response.data.data)
+            this.mainImage = response.data.data.galleries[0].photo
+            this.item = response.data.data
+            this.galleries = response.data.data.galleries
         }
+    },
+    mounted() {
+        this.getProductData()
     }
 }
 </script>
 
 <style>
-.product-thumbs {
+/* .product-thumbs {
     display: flex;
     overflow: hidden;
-}
+} */
 .product-item .pi-pic img{
     min-width: 100% !important;
     max-height: 650px !important;
 }
+/* .product-thumbs .product-thumbs-track {
+    display: flex;
+} */
 </style>
