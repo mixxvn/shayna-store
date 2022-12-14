@@ -47,7 +47,7 @@
                                     <h4>$ {{ item.price }}</h4>
                                 </div>
                                 <div class="quantity">
-                                    <a href="shopping-cart.html" class="primary-btn pd-cart">Add To Cart</a>
+                                    <a @click="saveCart(item.id, item.name, mainImage, item.price)" href="#" class="primary-btn pd-cart">Add To Cart</a>
                                 </div>
                             </div>
                         </div>
@@ -148,7 +148,8 @@ export default {
             }
             ],
             item : [],
-            galleries: []
+            galleries: [],
+            user_cart: []
         }
     },
     methods: {
@@ -161,10 +162,29 @@ export default {
             this.mainImage = response.data.data.galleries[0].photo
             this.item = response.data.data
             this.galleries = response.data.data.galleries
-        }
+        },
+        saveCart(id, name, photo, price){
+            const data = {
+                'id': id,
+                'name': name,
+                'photo': photo,
+                'price': price
+            }
+            this.user_cart.push(data)
+            console.log(this.user_cart)
+            const parsed = JSON.stringify(this.user_cart)
+            localStorage.setItem('user_cart', parsed)
+        }        
     },
     mounted() {
         this.getProductData()
+        if(localStorage.getItem('user_cart')){
+            try {
+                this.user_cart = JSON.parse(localStorage.getItem('user_cart'))
+            } catch (error) {
+                localStorage.removeItem('user_cart')
+            }
+        }
     }
 }
 </script>
