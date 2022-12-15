@@ -69,7 +69,7 @@
                                     <div class="form-group">
                                         <label for="alamatLengkap">Alamat Lengkap</label>
                                         <textarea class="form-control" id="alamatLengkap" rows="3" v-model="buyerInformation.address"></textarea>
-                                    </div>
+                                    </div> 
                                 </form>
                             </div>
                         </div>
@@ -88,7 +88,7 @@
                                     <li class="subtotal mt-3">No. Rekening <span>2208 1996 1403</span></li>
                                     <li class="subtotal mt-3">Nama Penerima <span>Shayna</span></li>
                                 </ul>
-                                <a href="success.html" class="proceed-btn">I ALREADY PAID</a>
+                                <a @click="checkout()" href="#" class="proceed-btn">I ALREADY PAID</a>
                             </div>
                         </div>
                     </div>
@@ -101,6 +101,7 @@
 
 <script>
 import NavigationBar from '@/components/layouts/NavigationBar.vue';
+import axios from 'axios'
 
 export default{
     name: "CartView",
@@ -122,6 +123,23 @@ export default{
         removeItemInCart(index){
             this.cart.splice(index, 1)
             localStorage.setItem('user_cart', JSON.stringify(this.cart))
+        },
+        checkout(){
+            let productIds = this.cart.map(function(product) { return product.id })
+
+            let data = {
+                'name': this.buyerInformation.name,
+                'email': this.buyerInformation.email,
+                'number': this.buyerInformation.phone_number,
+                'address': this.buyerInformation.address,
+                'transaction_total': this.total,
+                'transaction_status': 'PENDING',
+                'transaction_details': productIds
+            }
+
+            axios.post('http://shayna-backend.belajarkoding.com/api/checkout', data)
+            .then(() => this.$router.push('success'))
+            .catch(error => console.log(error))
         }
     },
     mounted() {
